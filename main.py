@@ -4,7 +4,8 @@ import mediapipe as mp
 import hands_detector as detector
 
 from  jokenpo_moviments import get_movimento
-from screen import print_default_screen, print_winner
+from screen import print_default_screen, print_winner, print_initial_screen, print_final_screen, spell_jokenpo
+from util import menu , set_players, print_fps, get_winner
 
 #Settings mp
 mp_hands = mp.solutions.hands
@@ -15,21 +16,10 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.8,
     max_num_hands = 2)
 
-# Define a janela de exibição das imagens, com tamanho manual e em tela cheia
 winName = 'Jokenpo'
-cv2.namedWindow(winName, cv2.WINDOW_NORMAL)
-cv2.setWindowProperty(winName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-
-def print_fps(image,current_time, prev_time):
-    current_time = time.time()
-    fps = 1 / (current_time - prev_time)
-    prev_time = current_time
-    #cv2.putText(image,f'FPS: {str(int(fps))}',(1,15),cv2.FONT_HERSHEY_COMPLEX_SMALL,1,(0,0,0),2)
-    print(int(fps))
-    return image, current_time
-
-def set_players(p1 = "Player1", p2 = "Player2"):
-    return [{'name': p1, 'hand': None, 'hand_side': None, 'moviment': None, 'score':0}, {'name': p2,'hand': None,'hand_side': None,'moviment': None,'score':0}]
+# Define a janela de exibição em tela cheia
+#cv2.namedWindow(winName, cv2.WINDOW_NORMAL)
+#cv2.setWindowProperty(winName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 def jokenpo(mov_player1, mov_player2):
     #Consider valid moves ["Pedra", "Papel", "Tesoura"]
@@ -52,21 +42,37 @@ def jokenpo(mov_player1, mov_player2):
         return -1  
 
 def main():
-    cap = cv2.VideoCapture(0)
-    prev_time = time.time() #For FPS    
+    res = menu()
+    max_rounds = res[1]
+    if not res[0]:
+        players = set_players()
+    else:
+        players = set_players(res[0][0],res[0][1])
 
-    players = set_players()
     player_1 = players[0]
     player_2 = players[1]
 
+    round = 1
+
+    spelling = False # True - Soletra "Jo ken Pooo"
+    spell = True 
+
+    cap = cv2.VideoCapture(0)
+    prev_time = time.time() #For FPS  
     with hands:
-        while cap.isOpened():
+        print_initial_screen(winName)
+        while cap.isOpened() and round <= max_rounds:
             success, img = cap.read()
             if not success:
                 print("Error capturing camera image")
                 break
             
-            print_default_screen(img,[player_1['name'], player_2['name']])
+            print_default_screen(img,[(player_1['name'], player_1['score']), (player_2['name'], player_2['score'])],round)
+            
+            if spelling and spell:
+                spell_jokenpo(winName, img, img.shape) #Faz a contagem fundo da imagem da câmera
+                #spell_jokenpo(winName, img, img.shape, black=True) #black= True Faz a contagem em um fundo preto
+                spell = False
 
             result = detector.hands_detector(hands,img)
             if result.multi_hand_landmarks:  
@@ -104,22 +110,26 @@ def main():
                         print_winner(img,"Empate")
                     else:
                         winner_player = players[jokenpo_result]
+                        winner_player['score'] += 1
                         print_winner(img,winner_player['name'])
                     cv2.imshow(winName,img)
-                    cv2.waitKey(5000)    
+                    cv2.waitKey(2000)
+                    round += 1
+                    if spelling: spell = True
                 else: 
                     hand_1 = None
                     hand_2 = None
                     print("only one hand detected")
-
             else: print("undetected hands")
 
-            cv2.flip(img, 1)
+            #cv2.flip(img, 1)
             cv2.imshow(winName,img)
             _, prev_time = print_fps(img,time.time(),prev_time)
 
             if cv2.waitKey(1) & 0xFF == 27:
                 break
+        print_final_screen(winName,img.shape,get_winner(players),player_1,player_2)
+        cv2.waitKey(0)
     cap.release()
     
 if __name__ == "__main__":
