@@ -6,9 +6,10 @@ Esse é um projeto que consiste em identificar qual foi a jogada de cada jogador
 
 ## Jogo
 
-Pedra, papel e tesoura, também chamado em algumas regiões do Brasil de jokenpô (do japonês じゃんけんぽん, jankenpon), é um jogo de mãos recreativo e simples para duas ou mais pessoas, que não requer equipamentos nem habilidade.
-No Janken-pon, os jogadores devem simultaneamente esticar a mão, na qual cada um formou um símbolo (que significa pedra, papel ou tesoura).
-A pedra é simbolizada por um punho fechado; a tesoura, por dois dedos esticados; e o papel, pela mão aberta.
+<p>Pedra, papel e tesoura, também chamado em algumas regiões do Brasil de jokenpô (do japonês じゃんけんぽん, jankenpon), é um jogo de mãos recreativo e simples para duas ou mais pessoas, que não requer equipamentos nem habilidade.</p>
+<p>No Janken-pon, os jogadores devem simultaneamente esticar a mão, na qual cada um formou um símbolo (que significa pedra, papel ou tesoura).</p>
+<p>A pedra é simbolizada por um punho fechado; a tesoura, por dois dedos esticados; e o papel, pela mão aberta.</p>
+
 ### Regras
 * Pedra ganha da tesoura (amassando-a ou quebrando-a).
 * Tesoura ganha do papel (cortando-o).
